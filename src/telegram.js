@@ -68,7 +68,7 @@ bot.on(/^\/routes( .+)*/i, (msg, props) => {
 			for(i in body.plugins){
 				LoadedRoutes = `${LoadedRoutes}${body.plugins[i].name}\n`
 			}
-			msg.reply.text(`Syntax: /routes add|remove Modulname\n- Add gibt diesem Chat eine Route\n- Remove entfernt die Route dieses Chats\nGeladene Modul sind:\n${LoadedRoutes}Beispiel Befehl:\n/routes add ${body.plugins[0].name}\nDas erstellt eine Route für das Modul ${body.plugins[0].name} mit der ChatID dieses Chats.`)
+			msg.reply.text(`Syntax: /routes <add|remove> <Modulname>\n- Add gibt diesem Chat eine Route\n- Remove entfernt die Route dieses Chats\nGeladene Modul sind:\n${LoadedRoutes}Beispiel Befehl:\n/routes add ${body.plugins[0].name}\nDas erstellt eine Route für das Modul ${body.plugins[0].name} mit der ChatID dieses Chats.`)
 		});
 	}else{
 		let AvaibleModes = ['add','remove','rem']
