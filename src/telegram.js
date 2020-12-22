@@ -239,6 +239,106 @@ bot.on(/^\/remAdmin/i, (msg) => {
 	}
 });
 
+/* User Managing List|Add|Remove */
+/* Users will also be notifyed if thery name is in the screen name */
+/* Users are behind Admins in priority, a userID should never be Admin AND User */
+bot.on(/^\/listUser/i, (msg) => {
+	bot.deleteMessage(msg.chat.id, msg.message_id).catch(error => f.Elog('Error: (delMessage)', error.description));
+	var keyID = 'User';
+	var keyName = 'UserName';
+	if(fs.existsSync(`${process.env.Admin_DB}/User.json`) && fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
+		var AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
+		var UserJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/User.json`));
+	}else{
+		msg.reply.text(`Es gibt noch keine User...`);
+	}
+	if(AdminJson['Admins'].includes(msg.from.id)){
+		let MessageAdmins = "Liste der User:\n\n";
+		for (i = 0; i < UserJson[keyID].length; i++) {
+			MessageAdmins = MessageAdmins + `${UserJson[keyName][i]}(${UserJson[keyID][i]})\n`
+		}
+		msg.reply.text(`${MessageAdmins}`)
+	}else{
+		msg.reply.text(`Du musst Admin sein um dies zu nutzen!`);
+	}
+});
+
+bot.on(/^\/addUser/i, (msg) => {
+		bot.deleteMessage(msg.chat.id, msg.message_id).catch(error => f.Elog('Error: (delMessage)', error.description));
+		if ('reply_to_message' in msg) {
+			var UserID = msg.reply_to_message.from.id
+			if ('username' in msg.reply_to_message.from) {
+				var username = msg.reply_to_message.from.username.toString();
+			}else{
+				var username = msg.reply_to_message.from.first_name.toString();
+			}
+
+			var keyID = 'User';
+			var keyName = 'UserName';
+			if(fs.existsSync(`${process.env.Admin_DB}/User.json`) && fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
+				var AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
+				var UserJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/User.json`));
+			}else{
+				console.log("No User file found!")
+				var UserJson = {}
+				UserJson[keyID] = [];
+				UserJson[keyName] = [];
+			}
+			if(AdminJson['Admins'].includes(msg.from.id)){
+				if(UserID === 777000 || UserID === 1087968824){
+					msg.reply.text(`${username}(${UserID}) dieser Nutzer darf kein User sein!`);
+				}else{
+					if(UserJson[keyID].includes(UserID)){
+						msg.reply.text(`${username}(${UserID}) ist bereits User!`);
+					}else{
+						UserJson[keyID].push(UserID);
+						UserJson[keyName].push(username);
+
+						let NewJson = JSON.stringify(UserJson);
+						msg.reply.text(`${username}(${UserID}) ist nun User!`);
+						fs.writeFile(`${process.env.Admin_DB}/User.json`, NewJson, (err) => {if (err) console.log(err);});
+					}
+				}
+			}else{
+				msg.reply.text(`Du musst Admin sein um dies zu nutzen!`);
+			}
+	}else{
+		msg.reply.text(`Fehler: Das kann nur als Antwort auf einen anderen Benutzer verwendet werden!`);
+	}
+});
+
+bot.on(/^\/remUser/i, (msg) => {
+	bot.deleteMessage(msg.chat.id, msg.message_id).catch(error => f.Elog('Error: (delMessage)', error.description));
+	if ('reply_to_message' in msg) {
+		var UserID = msg.reply_to_message.from.id
+		if ('username' in msg.reply_to_message.from) {
+			var username = msg.reply_to_message.from.username.toString();
+		}else{
+			var username = msg.reply_to_message.from.first_name.toString();
+		}
+		var keyID = 'User';
+		var keyName = 'UserName';
+		if(fs.existsSync(`${process.env.Admin_DB}/User.json`) && fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
+			var AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
+			var UserJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/User.json`));
+		}else{
+			msg.reply.text(`Es gibt noch keine User...`);
+		}
+		if(AdminJson['Admins'].includes(msg.from.id)){
+			removeItemFromArrayByName(UserJson[keyID], UserID)
+			removeItemFromArrayByName(UserJson[keyName], username)
+
+			let NewJson = JSON.stringify(UserJson);
+					msg.reply.text(`${username}(${UserID}) ist nun KEIN User mehr!`);
+					fs.writeFile(`${process.env.Admin_DB}/User.json`, NewJson, (err) => {if (err) console.log(err);});
+		}else{
+			msg.reply.text(`Du musst Admin sein um dies zu nutzen!`);
+		}
+	}else{
+		msg.reply.text(`Fehler: Das kann nur als Antwort auf einen anderen Benutzer verwendet werden!`);
+	}
+});
+
 /*Standart funktions Start|Alive|Help*/
 bot.on(/^\/alive/i, (msg) => {
 	OS.Hardware.then(function(Hardware) {
@@ -266,7 +366,7 @@ bot.on(/^\/help/i, (msg) => {
 		msg.reply.text(`Es gibt noch keine Admins...`);
 	}
 	if(AdminJson["Admins"].includes(msg.from.id)){
-		msg.reply.text(`Befehle für Nutzer:\n/help - Zeigt diese Nachricht\n/alive - Zeigt den Bot Status\n\nBefehle für Admins:\n/listRoutes - Zeigt alle Plugins und beispiel\n/listRoutes <Plugin Name> - Zeigt alle Routs\n/routes - Zeigt Hilfe für diesen Befehl\n/routes add|rem <Pluginname> - Erstellt/Löscht Route für Chat\n/listAdmin - Zeigt alle Admins\n/addAdmin - Fügt Nutzer als Admin hinzu\n/remAdmin - Nimmt dem Nutzer Admin weg`)
+		msg.reply.text(`Befehle für Nutzer:\n/help - Zeigt diese Nachricht\n/alive - Zeigt den Bot Status\n\nBefehle für Admins:\n/listRoutes - Zeigt alle Plugins und beispiel\n/listRoutes <Plugin Name> - Zeigt alle Routs\n/routes - Zeigt Hilfe für diesen Befehl\n/routes add|rem <Pluginname> - Erstellt/Löscht Route für Chat\n/listAdmin - Zeigt alle Admins\n/addAdmin - Fügt Nutzer als Admin hinzu\n/remAdmin - Nimmt dem Nutzer Admin weg\n/listUser - Zeigt alle User\n/addUser - Fügt Nutzer als User hinzu\n/remUser - Nimmt dem Nutzer User weg`)
 	}else{
 		msg.reply.text(`Befehle für Nutzer:\n/help - Zeigt diese Nachricht\n/alive - Zeigt den Bot Status`);
 	}

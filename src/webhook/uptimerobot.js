@@ -32,8 +32,9 @@ router.get("/", (reg, res) => {
 });
 
 router.get("/:Token", (reg, res) => {
-	if(fs.existsSync(`${process.env.Admin_DB}/Admins.json`) && fs.existsSync(`${process.env.Plugin_DB}/Routs_${PluginName}.json`)) {
+	if(fs.existsSync(`${process.env.Admin_DB}/Admins.json`) && fs.existsSync(`${process.env.Plugin_DB}/Routs_${PluginName}.json`) && fs.existsSync(`${process.env.Admin_DB}/User.json`)) {
 		var AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
+		var UserJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/User.json`));
 		var UptimeRobotJson = JSON.parse(fs.readFileSync(`${process.env.Plugin_DB}/Routs_${PluginName}.json`));
 		if(UptimeRobotJson["ChatToken"].includes(reg.params.Token)){
 			let indexChatToken = UptimeRobotJson["ChatToken"].indexOf(reg.params.Token);
@@ -43,6 +44,10 @@ router.get("/:Token", (reg, res) => {
 			if(AdminJson["AdminsName"].includes(MonitorNameSplit[1])){
 				let indexAdminsName = AdminJson["AdminsName"].indexOf(MonitorNameSplit[1]);
 				let UserID = AdminJson["Admins"][indexAdminsName];
+				var Mention = `<a href="tg://user?id=${UserID}">​</a>`
+			}else if(UserJson["UserName"].includes(MonitorNameSplit[1])){
+				let indexUsersName = UserJson["UserName"].indexOf(MonitorNameSplit[1]);
+				let UserID = UserJson["User"][indexUsersName];
 				var Mention = `<a href="tg://user?id=${UserID}">​</a>`
 			}else{
 				var Mention = "";
