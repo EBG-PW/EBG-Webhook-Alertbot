@@ -43,17 +43,17 @@ router.get("/:Token", (reg, res) => {
 			if(AdminJson["AdminsName"].includes(MonitorNameSplit[1])){
 				let indexAdminsName = AdminJson["AdminsName"].indexOf(MonitorNameSplit[1]);
 				let UserID = AdminJson["Admins"][indexAdminsName];
-				var Mention = `<a href="tg://user?id=${UserID}">​​</a>`
+				var Mention = `<a href="tg://user?id=${UserID}">​</a>`
 			}else{
 				var Mention = "";
 				for (i = 0; i < AdminJson["AdminsName"].length; i++) {
-					Mention += `<a href="tg://user?id=${AdminJson["Admins"][i]}">​​​​</a>`
+					Mention += `<a href="tg://user?id=${AdminJson["Admins"][i]}">​</a>`
 				}
 			}
 			if(!reg.query.alertDuration){
-				bot.sendMessage(ChatID, `Der Monitor ${reg.query.monitorFriendlyName} ist ${reg.query.alertTypeFriendlyName}\n${Mention}`, { parseMode: 'html' , webPreview: false})
+				bot.sendMessage(ChatID, `The screen ${reg.query.monitorFriendlyName} is ${reg.query.alertTypeFriendlyName}\n${Mention}`, { parseMode: 'html' , webPreview: false})
 			}else{
-				bot.sendMessage(ChatID, `Der Monitor ${reg.query.monitorFriendlyName} ist ${reg.query.alertTypeFriendlyName}\n\nDer Monitor war für ${reg.query.alertFriendlyDuration} down!\n${Mention}`, { parseMode: 'html' , webPreview: false})
+				bot.sendMessage(ChatID, `The screen ${reg.query.monitorFriendlyName} is ${reg.query.alertTypeFriendlyName}\n\nThe screen was for ${reg.query.alertFriendlyDuration} down!\n${Mention}`, { parseMode: 'html' , webPreview: false})
 			}
 			res.status(200)
 			res.json({message: "Working"});
