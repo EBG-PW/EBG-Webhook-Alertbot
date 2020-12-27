@@ -56,9 +56,9 @@ router.get("/:Token", (reg, res) => {
 				}
 			}
 			if(!reg.query.alertDuration){
-				bot.sendMessage(ChatID, `The screen ${reg.query.monitorFriendlyName} is ${reg.query.alertTypeFriendlyName}\n${Mention}`, { parseMode: 'html' , webPreview: false})
+				bot.sendMessage(ChatID, `The monitor ${reg.query.monitorFriendlyName} is ${reg.query.alertTypeFriendlyName}\n${Mention}`, { parseMode: 'html' , webPreview: false})
 			}else{
-				bot.sendMessage(ChatID, `The screen ${reg.query.monitorFriendlyName} is ${reg.query.alertTypeFriendlyName}\n\nThe screen was for ${reg.query.alertFriendlyDuration} down!\n${Mention}`, { parseMode: 'html' , webPreview: false})
+				bot.sendMessage(ChatID, `The monitor ${reg.query.monitorFriendlyName} is ${reg.query.alertTypeFriendlyName}\n\nThe monitor was for ${reg.query.alertFriendlyDuration} down!\n${Mention}`, { parseMode: 'html' , webPreview: false})
 			}
 			res.status(200)
 			res.json({message: "Working"});
