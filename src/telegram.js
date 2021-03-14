@@ -143,6 +143,35 @@ bot.on(/^\/routes( .+)*/i, (msg, props) => {
 		})
 	}
 });	
+/* -- Clear Notifications for TG and Twitter -- */
+bot.on(/^\/newPush/i, (msg) => {
+	if(fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
+		let AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
+		
+		if(AdminJson[keyID].includes(msg.from.id)){
+			return bot.sendMessage(msg.chat.id, 'Was soll die nächste Nachricht sein? (260 Zeichen)', {ask: 'newPush'});
+		}else{
+			msg.reply.text(`Du musst Admin sein um dies zu nutzen!`);
+		}
+	}else{
+		msg.reply.text(`Es gibt noch keine Admins...`);
+	}
+});
+
+bot.on('ask.newPush', msg => {
+	if(msg.text.length > 260){
+		return bot.sendMessage(msg.chat.id, `Die Nachricht ist zu lang (${msg.text.length})`, {ask: 'newPush'});
+	}else{
+		const replyMarkup = bot.inlineKeyboard([
+			[
+				bot.inlineButton('Information', {callback: 'nP_info'}),
+				bot.inlineButton('Störung', {callback: 'nP_stör'})
+			]
+		]);
+		return bot.sendMessage(msg.chat.id, `Ist diese Nachricht eine Information oder eine Störung?\n\n${msg.text}`, {replyMarkup});
+	}
+});
+
 /* -- Admin Managing List|Add|Remove -- */
 bot.on(/^\/listAdmin/i, (msg) => {
 	bot.deleteMessage(msg.chat.id, msg.message_id).catch(error => f.Elog('Error: (delMessage)', error.description));
