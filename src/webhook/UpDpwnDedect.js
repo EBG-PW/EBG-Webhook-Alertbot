@@ -63,7 +63,9 @@ function Check(){
 							let AppsJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownServices.json`));
 
 							dDown.map(Server => {
-								Apps = Apps + `${AppsJ.Services[Server]}\n`
+								if (typeof AppsJ.Services[Server] !== 'undefined'){
+									Apps = Apps + `${AppsJ.Services[Server]}\n`
+								}
 							});
 
 						}
