@@ -11,7 +11,7 @@ const Telebot = require('telebot');
 const bot = new Telebot({
 	token: process.env.Telegram_Bot_Token,
 	limit: 1000,
-        usePlugins: ['commandButton']
+        usePlugins: ['commandButton', 'askUser']
 });
 
 var Time_started = new Date().getTime();
@@ -143,8 +143,7 @@ bot.on(/^\/routes( .+)*/i, (msg, props) => {
 		})
 	}
 });	
-
-/* Admin Managing List|Add|Remove*/
+/* -- Admin Managing List|Add|Remove -- */
 bot.on(/^\/listAdmin/i, (msg) => {
 	bot.deleteMessage(msg.chat.id, msg.message_id).catch(error => f.Elog('Error: (delMessage)', error.description));
 	var keyID = 'Admins';
@@ -371,9 +370,10 @@ bot.on(/^\/help/i, (msg) => {
 		msg.reply.text(`Befehle für Nutzer:\n/help - Zeigt diese Nachricht\n/alive - Zeigt den Bot Status`);
 	}
 });
-
+/* -- Handle Bot -- */
 bot.start();
 
+/* -- Function -- */
 function removeItemFromArrayByName(arr) {
     var what, a = arguments, L = a.length, ax;
     while (L > 1 && arr.length) {

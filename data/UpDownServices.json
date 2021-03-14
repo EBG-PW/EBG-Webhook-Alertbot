@@ -1,0 +1,26 @@
+{
+    "TelegramChatId": "-1001379833664",
+    "Services": {
+        "Pterodactyl - N1": "Game Node - game1.ebg.pw",
+        "Pterodactyl - N2": "Game Node - game2.ebg.pw & proxy.ebg.pw",
+        "GodOfOwls Main": "Game Node - game3.ebg.pw & Plesk & Mail Server",
+        "Projekt Server": "Game Node - game4.ebg.pw",
+        "Geo Netcup": "STT Server & Backup EBG API",
+        "BolverMain Webserver": "EBG/VW/Flug Web and APIs & TelegramBots",
+        "WCG C1": "WCG Worker",
+        "WCG C2": "WCG Worker",
+        "WCG R1": "WCG Worker",
+        "WCG R2": "WCG Worker",
+        "WCG R3": "WCG Worker",
+        "WCG R4": "WCG Worker",
+        "WCG R5": "WCG Worker",
+        "WCG R6": "WCG Worker",
+        "FlugPI": "Flight Antenna (ADS-B)",
+        "ODroid N+": "Grafana & Monitoring",
+        "Lightshield I": "LoL API Mirroring",
+        "Lightshield II": "LoL API Mirroring",
+        "Lightshield III": "LoL API Mirroring",
+        "Minze": "Postgress DB",
+        "SRV-OWL-01": "AD/DNS Server & VMs & YachaVMs"
+    }
+}

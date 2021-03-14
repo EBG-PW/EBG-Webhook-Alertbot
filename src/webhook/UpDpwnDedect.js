@@ -49,20 +49,46 @@ function Check(){
 						let dUP = OnlineNames.filter(x => !GSS.includes(x));
 						let dDown = GSS.filter(x => !OnlineNames.includes(x));
 						let Msg = "";
+						let Apps = "";
 
 						dUP.map(Server => {
-							Msg + `Server <i>${Server}</i> went ONLINE!\n`
+							Msg = Msg + `Server <i>${Server}</i> went UP!\n`
 						});
 						
 						dDown.map(Server => {
-							Msg + `Server <i>${Server}</i> went DOWN!\n`
+							Msg = Msg + `Server <i>${Server}</i> went DOWN!\n`
 						});
 
+						if(fs.existsSync(`${process.env.Admin_DB}/UpDownServices.json`)){
+							let AppsJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownServices.json`));
+
+							dDown.map(Server => {
+								Apps = Apps + `${AppsJ.Services[Server]}\n`
+							});
+
+						}
+
+						if(Apps.length > 0){
+							Msg = Msg + "\n\nApplications\n" + Apps
+						}
+
 						GSS = OnlineNames
+
+						if(Msg.length > 0){ 
+							pushTelegram(Msg)
+						};
+						
 					}
 				}
 		  }
 	});
+}
+
+function pushTelegram(Msg){
+	if(fs.existsSync(`${process.env.Admin_DB}/UpDownServices.json`)){
+		let AppsJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownServices.json`));
+		bot.sendMessage(AppsJ.TelegramChatId, Msg, { parseMode: 'html' , webPreview: false});
+	}
 }
 
 setInterval(function(){
