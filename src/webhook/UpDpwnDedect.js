@@ -52,11 +52,11 @@ function Check(){
 						let Apps = "";
 
 						dUP.map(Server => {
-							Msg = Msg + `Server <i>${Server}</i> went UP!\n`
+							Msg = Msg + `Server ${Server} went UP!\n`
 						});
 						
 						dDown.map(Server => {
-							Msg = Msg + `Server <i>${Server}</i> went DOWN!\n`
+							Msg = Msg + `Server ${Server} went DOWN!\n`
 						});
 
 						if(fs.existsSync(`${process.env.Admin_DB}/UpDownServices.json`)){
