@@ -11,10 +11,11 @@ const Telebot = require('telebot');
 const bot = new Telebot({
 	token: process.env.Telegram_Bot_Token,
 	limit: 1000,
-        usePlugins: ['commandButton', 'askUser']
+        usePlugins: ['commandButton']
 });
 
-var Time_started = new Date().getTime();
+let NewPushStore = [];
+let Time_started = new Date().getTime();
 
 /* Route Managing List|Add|Remove*/
 
@@ -145,11 +146,13 @@ bot.on(/^\/routes( .+)*/i, (msg, props) => {
 });	
 /* -- Clear Notifications for TG and Twitter -- */
 bot.on(/^\/newPush/i, (msg) => {
+	var keyID = 'Admins';
 	if(fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
 		let AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
 		
 		if(AdminJson[keyID].includes(msg.from.id)){
-			return bot.sendMessage(msg.chat.id, 'Was soll die nächste Nachricht sein? (260 Zeichen)', {ask: 'newPush'});
+			NewPushStore.push(msg.from.id)
+			bot.sendMessage(msg.chat.id, 'Was soll die Nachricht sein? (260 Zeichen)');
 		}else{
 			msg.reply.text(`Du musst Admin sein um dies zu nutzen!`);
 		}
@@ -158,17 +161,22 @@ bot.on(/^\/newPush/i, (msg) => {
 	}
 });
 
-bot.on('ask.newPush', msg => {
-	if(msg.text.length > 260){
-		return bot.sendMessage(msg.chat.id, `Die Nachricht ist zu lang (${msg.text.length})`, {ask: 'newPush'});
-	}else{
-		const replyMarkup = bot.inlineKeyboard([
-			[
-				bot.inlineButton('Information', {callback: 'nP_info'}),
-				bot.inlineButton('Störung', {callback: 'nP_stör'})
-			]
-		]);
-		return bot.sendMessage(msg.chat.id, `Ist diese Nachricht eine Information oder eine Störung?\n\n${msg.text}`, {replyMarkup});
+bot.on('text', msg => {
+	if(NewPushStore.includes(msg.from.id)){
+		if(msg.text !== "/newPush"){
+			if(msg.text.length > 260){
+				bot.sendMessage(msg.chat.id, `Die Nachricht ist zu lang (${msg.text.length})`);
+			}else{
+				const replyMarkup = bot.inlineKeyboard([
+					[
+						bot.inlineButton('Information', {callback: 'nP_info'}),
+						bot.inlineButton('Störung', {callback: 'nP_stör'})
+					]
+				]);
+				removeItemFromArrayByName(NewPushStore, msg.from.id)
+				bot.sendMessage(msg.chat.id, `Ist diese Nachricht eine Information oder eine Störung?\n\n${msg.text}`, {replyMarkup});
+			}
+		}
 	}
 });
 
@@ -400,7 +408,32 @@ bot.on(/^\/help/i, (msg) => {
 	}
 });
 /* -- Handle Bot -- */
+
 bot.start();
+
+/* -- Handle Querycallback -- */
+
+/*
+bot.inlineButton('Information', {callback: 'nP_info'}),
+bot.inlineButton('Störung', {callback: 'nP_stör'})
+*/
+
+bot.on('callbackQuery', (msg) => {
+	if ('inline_message_id' in msg) {
+		var inlineId = msg.inline_message_id;
+	}else{
+		var chatId = msg.message.chat.id;
+		var messageId = msg.message.message_id;
+	}
+
+	var data = msg.data.split("_")
+	
+	if(data[0] === "nP")
+	{
+		let Text = msg.message.text.replace("Ist diese Nachricht eine Information oder eine Störung?\n\n","");
+		console.log(Text)
+	}
+});
 
 /* -- Function -- */
 function removeItemFromArrayByName(arr) {
