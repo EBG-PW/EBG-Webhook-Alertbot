@@ -95,7 +95,7 @@ function pushTelegram(Msg){
 
 setInterval(function(){
 	Check();
-  }, 1*1000+50);
+  }, 1*5000+50);
 
 module.exports = {
 	router: router,
