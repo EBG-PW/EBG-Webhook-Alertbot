@@ -14,11 +14,12 @@ const bot = new Telebot({
 
 const PluginName = "UpDownDedect";
 const PluginRequirements = [];
-const PluginVersion = "0.0.1";
+const PluginVersion = "0.0.2";
 const PluginAuthor = "BolverBlitz";
 const PluginDocs = "Privat";
 
 let GSS = [];
+let GSSStore = {"Server":[],"Time":[]};
 let skip = 0
 
 const router = express.Router();
@@ -46,31 +47,22 @@ function Check(){
 					}else{
 						let dUP = OnlineNames.filter(x => !GSS.includes(x));
 						let dDown = GSS.filter(x => !OnlineNames.includes(x));
-						let Msg = "";
-						let Apps = "";
-						dUP.map(Server => {
-							Msg = Msg + `Server ${Server} went UP!\n`
-						});
+
+						console.log(dDown, GSSStore.Server)
 						dDown.map(Server => {
-							Msg = Msg + `Server ${Server} went DOWN!\n`
+							GSSStore.Server.push(Server);
+							GSSStore.Time.push(Date.now());
 						});
-						if(fs.existsSync(`${process.env.Admin_DB}/UpDownServices.json`)){
-							let AppsJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownServices.json`));
-							dDown.map(Server => {
-								if (typeof AppsJ.Services[Server] !== 'undefined'){
-									Apps = Apps + `${AppsJ.Services[Server]}\n`
-								}
-							});
-						}
-						if(Apps.length > 0){
-							Msg = Msg + "\n\nApplications\n" + Apps
-						}
+
+						dUP.map(Server => {
+							let index = GSSStore.Server.indexOf(Server);
+							removeItemFromArrayByName(GSSStore.Server, Server);
+							GSSStore.Time.splice(index, 1)
+						});
+
 						GSS = OnlineNames
-						if(Msg.length > 0){ 
-							pushTelegram(Msg)
-						};
-					}
 				}
+		  	}
 		  }
 	});
 }
@@ -80,6 +72,17 @@ function pushTelegram(Msg){
 		let AppsJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownServices.json`));
 		bot.sendMessage(AppsJ.TelegramChatId, Msg, { parseMode: 'html' , webPreview: false});
 	}
+}
+
+function removeItemFromArrayByName(arr) {
+    var what, a = arguments, L = a.length, ax;
+    while (L > 1 && arr.length) {
+        what = a[--L];
+        while ((ax= arr.indexOf(what)) !== -1) {
+            arr.splice(ax, 1);
+        }
+    }
+    return arr;
 }
 
 setInterval(function(){
