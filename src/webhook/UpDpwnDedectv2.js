@@ -19,7 +19,7 @@ const PluginAuthor = "BolverBlitz";
 const PluginDocs = "Privat";
 
 let GSS = [];
-let GSSStore = {"Server":[],"Time":[]};
+let GSSStore = {"Server":[],"Time":[],"Pushed":[]};
 let skip = 0
 
 const router = express.Router();
@@ -45,26 +45,65 @@ function Check(){
 					if(GSS.length === 0){
 						GSS = OnlineNames
 					}else{
+						let Msg = "";
+
 						let dUP = OnlineNames.filter(x => !GSS.includes(x));
 						let dDown = GSS.filter(x => !OnlineNames.includes(x));
 
-						console.log(dDown, GSSStore.Server)
+						console.log(dDown, GSSStore)
 						dDown.map(Server => {
 							GSSStore.Server.push(Server);
 							GSSStore.Time.push(Date.now());
+							GSSStore.Pushed.push(false)
 						});
 
 						dUP.map(Server => {
+							Msg = Msg + `Server ${Server} went UP!\n`
 							let index = GSSStore.Server.indexOf(Server);
 							removeItemFromArrayByName(GSSStore.Server, Server);
 							GSSStore.Time.splice(index, 1)
+							GSSStore.Pushed.splice(index, 1)
 						});
 
-						GSS = OnlineNames
+						if(dUP.length >= 1){
+							pushTelegram(Msg);
+						}
+
+						checkGSStore();
+
+						GSS = OnlineNames;
 				}
 		  	}
 		  }
 	});
+}
+function checkGSStore(){
+	let Msg = "";
+	let Apps = "";
+	let AppsJ;
+	if(fs.existsSync(`${process.env.Admin_DB}/UpDownServices.json`)){
+		AppsJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownServices.json`));
+	}
+	GSSStore.Time.map((time, i) => {
+		if(time+(1*60*1000) <= Date.now()){
+			if(!GSSStore.Pushed[i]){
+				Msg = Msg + `Server ${GSSStore.Server[i]} went DOWN!\n`
+				GSSStore.Pushed[i] = true
+				if(AppsJ){
+					if (typeof AppsJ.Services[GSSStore.Server[i]] !== 'undefined'){
+						Apps = Apps + `${AppsJ.Services[GSSStore.Server[i]]}\n`
+					};
+				};
+			};
+		};
+	});
+
+	if(Apps.length > 0){
+		Msg = Msg + "\n\nApplications\n" + Apps;
+	}
+	if(Msg.length >= 1){
+		pushTelegram(Msg);
+	}
 }
 
 function pushTelegram(Msg){
