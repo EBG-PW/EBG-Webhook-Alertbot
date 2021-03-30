@@ -101,7 +101,7 @@ function checkGSStore(){
 	});
 
 	if(Apps.length > 0){
-		Msg = Msg + "\n\nApplications\n" + Apps;
+		Msg = Msg + "\nApplications\n" + Apps;
 	}
 	if(Msg.length >= 1){
 		pushTelegram(Msg);
