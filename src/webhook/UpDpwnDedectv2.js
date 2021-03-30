@@ -58,14 +58,16 @@ function Check(){
 						});
 
 						dUP.map(Server => {
-							Msg = Msg + `Server ${Server} went UP!\n`
 							let index = GSSStore.Server.indexOf(Server);
+							if(GSSStore.Pushed[index] === true){
+								Msg = Msg + `Server ${Server} went UP!\n`
+							}
 							removeItemFromArrayByName(GSSStore.Server, Server);
 							GSSStore.Time.splice(index, 1)
 							GSSStore.Pushed.splice(index, 1)
 						});
 
-						if(dUP.length >= 1){
+						if(Msg.length >= 1){
 							pushTelegram(Msg);
 						}
 
