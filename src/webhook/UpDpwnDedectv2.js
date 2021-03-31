@@ -95,11 +95,13 @@ function checkGSStore(){
 	let Msg = "";
 	let Apps = "";
 	let AppsJ;
-	if(fs.existsSync(`${process.env.Admin_DB}/UpDownServices.json`)){
+	if(fs.existsSync(`${process.env.Admin_DB}/UpDownServices.json`) && fs.existsSync(`${process.env.Admin_DB}/UpDownConfig.json`)){
 		AppsJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownServices.json`));
+		ConfJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownConfig.json`));
 	}
+	let DownTime = ConfJ.TimeUntilDownNotification*1000 || 1*60*1000
 	GSSStore.Time.map((time, i) => {
-		if(time+(1*60*1000) <= Date.now()){
+		if(time+DownTime <= Date.now()){
 			if(!GSSStore.Pushed[i]){
 				Msg = Msg + `Server ${GSSStore.Server[i]} went DOWN!\n`
 				GSSStore.Pushed[i] = true
