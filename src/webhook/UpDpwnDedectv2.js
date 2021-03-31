@@ -11,12 +11,19 @@ const bot = new Telebot({
         usePlugins: ['commandButton']
 });
 
-
 const PluginName = "UpDownDedect";
 const PluginRequirements = [];
 const PluginVersion = "0.0.2";
 const PluginAuthor = "BolverBlitz";
 const PluginDocs = "Privat";
+
+//Für Zeit Befehle
+var Sekunde = 1000;
+var Minute = Sekunde*60;
+var Stunde = Minute*60;
+var Tag = Stunde*24;
+var Monat = Tag*(365/12);
+var Jahr = Tag*365;
 
 let GSS = [];
 let GSSStore = {"Server":[],"Time":[],"Pushed":[]};
@@ -60,7 +67,7 @@ function Check(){
 						dUP.map(Server => {
 							let index = GSSStore.Server.indexOf(Server);
 							if(GSSStore.Pushed[index] === true){
-								Msg = Msg + `Server ${Server} went UP!\n`
+								Msg = Msg + `Server ${Server} went UP it was down for ${convertTime(Date.now()-GSSStore.Time[index])}\n`
 							}
 							removeItemFromArrayByName(GSSStore.Server, Server);
 							GSSStore.Time.splice(index, 1)
@@ -79,6 +86,7 @@ function Check(){
 		  }
 	});
 }
+
 function checkGSStore(){
 	let Msg = "";
 	let Apps = "";
@@ -115,6 +123,7 @@ function pushTelegram(Msg){
 	}
 }
 
+
 function removeItemFromArrayByName(arr) {
     var what, a = arguments, L = a.length, ax;
     while (L > 1 && arr.length) {
@@ -124,6 +133,22 @@ function removeItemFromArrayByName(arr) {
         }
     }
     return arr;
+}
+
+ let convertTime = function uptime(uptime) {
+	var uptimeTage =  Math.floor((uptime)/Tag);
+	var uptimeTageRest = uptime-(uptimeTage*Tag)
+	var uptimeStunde =  Math.floor((uptimeTageRest)/Stunde);
+	var uptimeStundeRest = uptimeTageRest-(uptimeStunde*Stunde)
+	var uptimeMinute =  Math.floor((uptimeStundeRest)/Minute);
+	var uptimeMinuteRest = uptimeStundeRest-(uptimeMinute*Minute)
+	var uptimeSekunde =  Math.floor((uptimeMinuteRest)/Sekunde);
+	let uptimeoutput = "";
+	if(uptimeTage >= 1){uptimeoutput = `${uptimeoutput}${uptimeTage}d:`}
+	if(uptimeStunde >= 1){uptimeoutput = `${uptimeoutput}${uptimeStunde}h:`}
+	if(uptimeMinute >= 1){uptimeoutput = `${uptimeoutput}${uptimeMinute}m:`}
+	if(uptimeSekunde >= 1){uptimeoutput = `${uptimeoutput}${uptimeSekunde}s`}
+	return uptimeoutput;
 }
 
 setInterval(function(){
