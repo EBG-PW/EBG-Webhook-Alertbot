@@ -87,6 +87,10 @@ function Check(){
 	});
 }
 
+/**
+ * Will check if one or multiple entrys of GSSStore are ready to push.
+ * This will trigger a "Server went down" message.
+ */
 function checkGSStore(){
 	let Msg = "";
 	let Apps = "";
@@ -116,6 +120,10 @@ function checkGSStore(){
 	}
 }
 
+/**
+ * Will send a html parsed string to telegram
+ * @param {String} Msg 
+ */
 function pushTelegram(Msg){
 	if(fs.existsSync(`${process.env.Admin_DB}/UpDownServices.json`)){
 		let AppsJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownServices.json`));
@@ -123,7 +131,12 @@ function pushTelegram(Msg){
 	}
 }
 
-
+/**
+ * Will remove the given variable from the string if it exists 
+ * @param {string|number} a
+ * @param {array} arr
+ * @returns {array}
+ */
 function removeItemFromArrayByName(arr) {
     var what, a = arguments, L = a.length, ax;
     while (L > 1 && arr.length) {
@@ -134,8 +147,12 @@ function removeItemFromArrayByName(arr) {
     }
     return arr;
 }
-
- let convertTime = function uptime(uptime) {
+/**
+ * Converts a epochtime into string split into days, hours, minutes and seconds
+ * @param {number} uptime
+ * @returns {String}
+ */
+let convertTime = function uptime(uptime) {
 	var uptimeTage =  Math.floor((uptime)/Tag);
 	var uptimeTageRest = uptime-(uptimeTage*Tag)
 	var uptimeStunde =  Math.floor((uptimeTageRest)/Stunde);
