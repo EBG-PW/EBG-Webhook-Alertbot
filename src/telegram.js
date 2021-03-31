@@ -144,7 +144,8 @@ bot.on(/^\/routes( .+)*/i, (msg, props) => {
 		})
 	}
 });	
-/* -- Clear Notifications for TG and Twitter -- */
+
+/* -- Create Notifications for TG and Twitter -- */
 bot.on(/^\/newPush/i, (msg) => {
 	var keyID = 'Admins';
 	if(fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
@@ -178,6 +179,19 @@ bot.on('text', msg => {
 			}
 		}
 	}
+});
+
+/* -- Mute the  automatet Alerts-- */
+bot.on(/^\/mute/i, (msg) => {
+	const replyMarkup = bot.inlineKeyboard([
+		[
+			bot.inlineButton('10 Minuten', {callback: 'nP_info'}),
+			bot.inlineButton('1 Stunde', {callback: 'nP_stör'}),
+			bot.inlineButton('1 Tag', {callback: 'nP_stör'})
+		],[
+			bot.inlineButton('Unmute', {callback: 'nP_stör'})
+		]
+	]);
 });
 
 /* -- Admin Managing List|Add|Remove -- */
