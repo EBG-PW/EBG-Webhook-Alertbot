@@ -105,7 +105,9 @@ function checkGSStore(){
 		if(time+DownTime <= Date.now()){
 			if(!GSSStore.Pushed[i]){
 				Msg = Msg + `Server ${GSSStore.Server[i]} went DOWN!\n`
-				GSSStore.Pushed[i] = true
+				if(ConfJ.Mute = !true){
+					GSSStore.Pushed[i] = true
+				}
 				if(AppsJ){
 					if (typeof AppsJ.Services[GSSStore.Server[i]] !== 'undefined'){
 						Apps = Apps + `${AppsJ.Services[GSSStore.Server[i]]}\n`
