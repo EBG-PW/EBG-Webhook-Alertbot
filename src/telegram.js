@@ -183,15 +183,29 @@ bot.on('text', msg => {
 
 /* -- Mute the  automatet Alerts-- */
 bot.on(/^\/mute/i, (msg) => {
-	const replyMarkup = bot.inlineKeyboard([
-		[
-			bot.inlineButton('10 Minuten', {callback: 'nP_info'}),
-			bot.inlineButton('1 Stunde', {callback: 'nP_stör'}),
-			bot.inlineButton('1 Tag', {callback: 'nP_stör'})
-		],[
-			bot.inlineButton('Unmute', {callback: 'nP_stör'})
-		]
-	]);
+	let replyMarkup, MSG;
+	if(fs.existsSync(`${process.env.Admin_DB}/UpDownConfig.json`)){
+		let ConfJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownConfig.json`));
+		if(ConfJ.Mute === true){
+			MSG = `Der Kanal ist noch bix ${ConfJ.MuteUntil.toLocaleTimeString('de-DE')} gemutet, möchtest du Ihn entmuten?`
+			replyMarkup = bot.inlineKeyboard([[
+					bot.inlineButton('Unmute', {callback: 'm_mute'})
+				]
+			]);
+		}else{
+			MSG = `Wie lange möchtest du den Kanal muten?`
+			replyMarkup = bot.inlineKeyboard([
+				[
+					bot.inlineButton('10 Minuten', {callback: 'm_1'}),
+					bot.inlineButton('1 Stunde', {callback: 'm_2'}),
+					bot.inlineButton('1 Tag', {callback: 'm_3'})
+				]
+			]);
+		}
+		bot.sendMessage(msg.chat.id, MSG, {replyMarkup});
+	}else{
+		bot.sendMessage(msg.chat.id, `Fehler: Die Config konnte nicht gefunden werden.`);
+	}
 });
 
 /* -- Admin Managing List|Add|Remove -- */
