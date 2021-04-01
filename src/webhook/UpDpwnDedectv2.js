@@ -58,7 +58,7 @@ function Check(){
 						let dUP = OnlineNames.filter(x => !GSS.includes(x));
 						let dDown = GSS.filter(x => !OnlineNames.includes(x));
 
-						console.log(dDown, GSSStore)
+						//console.log(dDown, GSSStore)
 						dDown.map(Server => {
 							GSSStore.Server.push(Server);
 							GSSStore.Time.push(Date.now());
@@ -95,7 +95,7 @@ function Check(){
 function checkGSStore(){
 	let Msg = "";
 	let Apps = "";
-	let AppsJ;
+	let AppsJ, ConfJ;
 	if(fs.existsSync(`${process.env.Admin_DB}/UpDownServices.json`) && fs.existsSync(`${process.env.Admin_DB}/UpDownConfig.json`)){
 		AppsJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownServices.json`));
 		ConfJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownConfig.json`));
