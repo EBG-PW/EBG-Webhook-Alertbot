@@ -183,6 +183,10 @@ bot.on('text', msg => {
 
 /* -- Mute the  automatet Alerts-- */
 bot.on(/^\/mute/i, (msg) => {
+	bot.deleteMessage(msg.chat.id, msg.message_id).catch((error) => {
+		console.error(error);
+	});
+
 	let replyMarkup, MSG;
 	var keyID = 'Admins';
 
@@ -199,6 +203,8 @@ bot.on(/^\/mute/i, (msg) => {
 				MSG = `Der Kanal ist noch bis ${new Date(ConfJ.MuteUntil).toLocaleTimeString('de-DE')} gemutet, möchtest du Ihn entmuten?`
 				replyMarkup = bot.inlineKeyboard([[
 						bot.inlineButton('Unmute', {callback: 'm_mute'})
+					],[
+						bot.inlineButton('Schließen', {callback: 'm_delete'}),
 					]
 				]);
 			}else{
@@ -208,6 +214,8 @@ bot.on(/^\/mute/i, (msg) => {
 						bot.inlineButton('10 Minuten', {callback: 'm_1'}),
 						bot.inlineButton('1 Stunde', {callback: 'm_2'}),
 						bot.inlineButton('1 Tag', {callback: 'm_3'})
+					],[
+						bot.inlineButton('Schließen', {callback: 'm_delete'}),
 					]
 				]);
 			}
@@ -471,39 +479,44 @@ bot.on('callbackQuery', (msg) => {
 	if(data[0] === "nP")
 	{
 		let Text = msg.message.text.replace("Ist diese Nachricht eine Information oder eine Störung?\n\n","");
-		console.log(Text)
 	}else if(data[0] === "m"){
-		if(fs.existsSync(`${process.env.Admin_DB}/UpDownConfig.json`)){
-			let TimeString, MSG;
-			let ConfJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownConfig.json`));
+		if(data[1] === "delete"){
+			bot.deleteMessage(chatId, messageId).catch((error) => {
+				console.error(error);
+			  });
+		}else{
+			if(fs.existsSync(`${process.env.Admin_DB}/UpDownConfig.json`)){
+				let TimeString, MSG;
+				let ConfJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownConfig.json`));
 
-			if(data[1] === "mute"){
-				ConfJ.Mute = false;
-				MSG = `Der Kanal wurde entmutet!`;
-			}else{
-				let TimeSpan;
-				ConfJ.Mute = true;
-				if(data[1] === "1"){TimeSpan = 10*60; TimeString = "10 Minuten";};
-				if(data[1] === "2"){TimeSpan = 60*60; TimeString = "1 Stunde";};
-				if(data[1] === "3"){TimeSpan = 24*60*60; TimeString = "1 Tag";};
-				ConfJ.MuteUntil = Date.now() + TimeSpan*1000;
-				MSG = `Der Kanal wurde bis ${new Date(ConfJ.MuteUntil).toLocaleTimeString('de-DE')} gemutet!\nDauer: ${TimeString}`;
-			}
+				if(data[1] === "mute"){
+					ConfJ.Mute = false;
+					MSG = `Der Kanal wurde entmutet!`;
+				}else{
+					let TimeSpan;
+					ConfJ.Mute = true;
+					if(data[1] === "1"){TimeSpan = 10*60; TimeString = "10 Minuten";};
+					if(data[1] === "2"){TimeSpan = 60*60; TimeString = "1 Stunde";};
+					if(data[1] === "3"){TimeSpan = 24*60*60; TimeString = "1 Tag";};
+					ConfJ.MuteUntil = Date.now() + TimeSpan*1000;
+					MSG = `Der Kanal wurde bis ${new Date(ConfJ.MuteUntil).toLocaleTimeString('de-DE')} gemutet!\nDauer: ${TimeString}`;
+				}
 
-			if ('inline_message_id' in msg) {
-				bot.editMessageText(
-					{inlineMsgId: inlineId}, MSG,
-					{parseMode: 'html', webPreview: false}
-				).catch(error => console.log('Error:', error));
-			}else{
-				bot.editMessageText(
-					{chatId: chatId, messageId: messageId}, MSG,
-					{parseMode: 'html', webPreview: false}
-				).catch(error => console.log('Error:', error));
-			}
+				if ('inline_message_id' in msg) {
+					bot.editMessageText(
+						{inlineMsgId: inlineId}, MSG,
+						{parseMode: 'html', webPreview: false}
+					).catch(error => console.log('Error:', error));
+				}else{
+					bot.editMessageText(
+						{chatId: chatId, messageId: messageId}, MSG,
+						{parseMode: 'html', webPreview: false}
+					).catch(error => console.log('Error:', error));
+				}
 
-			let NewJson = JSON.stringify(ConfJ);
-			fs.writeFile(`${process.env.Admin_DB}/UpDownConfig.json`, NewJson, (err) => {if (err) console.log(err);});
+				let NewJson = JSON.stringify(ConfJ);
+				fs.writeFile(`${process.env.Admin_DB}/UpDownConfig.json`, NewJson, (err) => {if (err) console.log(err);});
+			}	
 		}
 	}
 });
