@@ -184,27 +184,39 @@ bot.on('text', msg => {
 /* -- Mute the  automatet Alerts-- */
 bot.on(/^\/mute/i, (msg) => {
 	let replyMarkup, MSG;
-	if(fs.existsSync(`${process.env.Admin_DB}/UpDownConfig.json`)){
-		let ConfJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownConfig.json`));
-		if(ConfJ.Mute === true){
-			MSG = `Der Kanal ist noch bis ${new Date(ConfJ.MuteUntil).toLocaleTimeString('de-DE')} gemutet, möchtest du Ihn entmuten?`
-			replyMarkup = bot.inlineKeyboard([[
-					bot.inlineButton('Unmute', {callback: 'm_mute'})
-				]
-			]);
-		}else{
-			MSG = `Wie lange möchtest du den Kanal muten?`
-			replyMarkup = bot.inlineKeyboard([
-				[
-					bot.inlineButton('10 Minuten', {callback: 'm_1'}),
-					bot.inlineButton('1 Stunde', {callback: 'm_2'}),
-					bot.inlineButton('1 Tag', {callback: 'm_3'})
-				]
-			]);
-		}
-		bot.sendMessage(msg.chat.id, MSG, {replyMarkup});
+	var keyID = 'Admins';
+
+	if(fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
+		var AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
 	}else{
-		bot.sendMessage(msg.chat.id, `Fehler: Die Config konnte nicht gefunden werden.`);
+		msg.reply.text(`Es gibt noch keine Admins...`);
+	}
+
+	if(AdminJson[keyID].includes(msg.from.id)){
+		if(fs.existsSync(`${process.env.Admin_DB}/UpDownConfig.json`)){
+			let ConfJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownConfig.json`));
+			if(ConfJ.Mute === true){
+				MSG = `Der Kanal ist noch bis ${new Date(ConfJ.MuteUntil).toLocaleTimeString('de-DE')} gemutet, möchtest du Ihn entmuten?`
+				replyMarkup = bot.inlineKeyboard([[
+						bot.inlineButton('Unmute', {callback: 'm_mute'})
+					]
+				]);
+			}else{
+				MSG = `Wie lange möchtest du den Kanal muten?`
+				replyMarkup = bot.inlineKeyboard([
+					[
+						bot.inlineButton('10 Minuten', {callback: 'm_1'}),
+						bot.inlineButton('1 Stunde', {callback: 'm_2'}),
+						bot.inlineButton('1 Tag', {callback: 'm_3'})
+					]
+				]);
+			}
+			bot.sendMessage(msg.chat.id, MSG, {replyMarkup});
+		}else{
+			bot.sendMessage(msg.chat.id, `Fehler: Die Config konnte nicht gefunden werden.`);
+		}
+	}else{
+		msg.reply.text(`Du musst Admin sein um dies zu nutzen!`);
 	}
 });
 
