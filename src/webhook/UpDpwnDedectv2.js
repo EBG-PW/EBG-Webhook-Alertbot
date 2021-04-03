@@ -70,6 +70,16 @@ function Check(){
 
 						if(Msg.length >= 1){
 							Sender.pushTelegram(Msg);
+							if(Msg.length <= 260){
+								Sender.pushTweet(Msg, false).catch((error) => {
+									console.error(error);
+								});
+							}else{
+								Msg = "More servers than i can fit here went up.\n\nCheck server.ebg.pw"
+								Sender.pushTweet(Msg, false).catch((error) => {
+									console.error(error);
+								});
+							}
 						}
 
 						checkGSStore();
@@ -111,10 +121,20 @@ function checkGSStore(){
 	});
 
 	if(Apps.length > 0){
-		Msg = Msg + "\nApplications\n" + Apps;
+		Msg = Msg + "\nApplications:\n" + Apps;
 	}
 	if(Msg.length >= 1){
 		Sender.pushTelegram(Msg);
+		if(Msg.length <= 260){
+			Sender.pushTweet(Msg, false).catch((error) => {
+				console.error(error);
+			});
+		}else{
+			Msg = "A lot of servers just went down :(\n\nCheck server.ebg.pw"
+			Sender.pushTweet(Msg, false).catch((error) => {
+				console.error(error);
+			});
+		}
 	}
 }
 

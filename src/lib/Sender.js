@@ -1,6 +1,14 @@
 require('dotenv').config();
 const fs = require('fs');
 
+const Twitter = require('twitter');
+var client = new Twitter({
+    consumer_key: process.env.Twitter_APIKey,
+    consumer_secret: process.env.Twitter_API_S,
+    access_token_key: process.env.Twitter_AccesToken,
+    access_token_secret: process.env.Twitter_AccesToken_S
+  });
+
 const Telebot = require('telebot');
 const bot = new Telebot({
 	token: process.env.Telegram_Bot_Token,
@@ -30,6 +38,34 @@ const bot = new Telebot({
 	}
 }
 
+/**
+ * Will send a html parsed string to twitter
+ * Loads from UpDownConfig and will handle the mute function
+ * @param {String} text 
+ * @param {boolean} override
+ * @returns {Promise}
+ */
+let pushTweet = function(text, override) {
+	return new Promise(function(resolve, reject) {
+        if(fs.existsSync(`${process.env.Admin_DB}/UpDownConfig.json`)){
+            let ConfJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownConfig.json`));
+            if(!ConfJ.Mute || override){
+                client.post('statuses/update', {status: text}, function(error, tweet, response) {
+                    if (!error) {
+                        tweet.url = 'https://twitter.com/' + tweet.user.screen_name + '/status/' + tweet.id_str;
+                        resolve(tweet);
+                    }else{
+                        console.log(error)
+                        throw error;
+                    }
+                });
+            }
+        }
+	});
+}
+
+
 module.exports = {
-	pushTelegram
+	pushTelegram,
+    pushTweet
   };
