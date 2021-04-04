@@ -165,7 +165,7 @@ bot.on(/^\/newPush/i, (msg) => {
 
 bot.on('text', msg => {
 	if(NewPushStore.includes(msg.from.id)){
-		if(msg.text !== "/newPush"){
+		if(!msg.text.match(/^\/newPush/i)){
 			if(msg.text.length > 260){
 				bot.sendMessage(msg.chat.id, `Die Nachricht ist zu lang (${msg.text.length})`);
 			}else{
@@ -542,12 +542,16 @@ bot.on('callbackQuery', (msg) => {
 						bot.inlineButton('#Webserver', {callback: `h_Webserver_${data[2]+1}`})
 					],[
 						bot.inlineButton(`Senden (${Text.length})`, {callback: `Senden`})
+					],[
+						bot.inlineButton(`Abbrechen`, {callback: `Exit`})
 					]
 				]);
 			}else{
 				replyMarkup = bot.inlineKeyboard([
 					[
 						bot.inlineButton(`Senden (${Text.length})`, {callback: `Senden`})
+					],[
+						bot.inlineButton(`Abbrechen`, {callback: `Exit`})
 					]
 				]);
 			}
@@ -564,6 +568,10 @@ bot.on('callbackQuery', (msg) => {
 				).catch(error => console.log('Error:', error));
 			}
 
+		}else if(data[0] === "Exit"){
+			bot.deleteMessage(chatId, messageId).catch((error) => {
+				console.error(error);
+			});
 		}else if(data[0] === "Senden"){
 			Promise.all([bot.sendMessage(process.env.Telegram_EBGKanal_ID, msg.message.text, { parseMode: 'html' , webPreview: false}), Sender.pushTweet(msg.message.text, true)]).then((data) => {
 				//let MSG = `Telegram: https://t.me/${data[0].chat.username}/${data[0].message_id}\nTwitter: ${data[1].url}\n\nText:\n${msg.message.text}\n\nTwitter Stats:\nFollower: ${data[1].user.followers_count}\nLikes: ${data[1].favorite_count}\nRetweets: ${data[1].retweet_count}`
