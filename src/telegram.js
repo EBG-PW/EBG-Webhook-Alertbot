@@ -482,11 +482,87 @@ bot.on('callbackQuery', (msg) => {
 			var messageId = msg.message.message_id;
 		}
 
-		var data = msg.data.split("_")
+		let data = msg.data.split("_")
+		let replyMarkup;
 		
 		if(data[0] === "nP")
 		{
+			let type;
 			let Text = msg.message.text.replace("Ist diese Nachricht eine Information oder eine Störung?\n\n","");
+			if(data[1] === "stör"){type = "-- Alert --\n"}else{type = "-- Info --\n"}
+			Text = `${type}${Text}`
+
+			const replyMarkup = bot.inlineKeyboard([
+				[
+					bot.inlineButton('#Servers', {callback: 'h_Servers_0'}),
+					bot.inlineButton('#vServers', {callback: 'h_vServers_0'}),
+					bot.inlineButton('#Docker', {callback: 'h_Docker_0'}),
+				],[
+					bot.inlineButton('#Hardware', {callback: 'h_Hardware_0'}),
+					bot.inlineButton('#Software', {callback: 'h_Software_0'}),
+					bot.inlineButton('#Network', {callback: 'h_Network_0'}),
+				],[
+					bot.inlineButton('#Pterodactyl', {callback: 'h_Pterodactyl_0'}),
+					bot.inlineButton('#Webserver', {callback: 'h_Webserver_0'})
+				]
+			]);
+
+			if ('inline_message_id' in msg) {
+				bot.editMessageText(
+					{inlineMsgId: inlineId}, Text,
+					{parseMode: 'html', webPreview: false, replyMarkup}
+				).catch(error => console.log('Error:', error));
+			}else{
+				bot.editMessageText(
+					{chatId: chatId, messageId: messageId}, Text,
+					{parseMode: 'html', webPreview: false, replyMarkup}
+				).catch(error => console.log('Error:', error));
+			}
+		}else if(data[0] === "h"){
+			let Text = msg.message.text
+			if(Number(data[2]) === 0){
+				Text = `${Text}\n\n#${data[1]}`
+			}else{
+				Text = `${Text} #${data[1]}`
+			}
+			
+			if(Number(data[2]) <= 2){
+				replyMarkup = bot.inlineKeyboard([
+					[
+						bot.inlineButton('#Servers', {callback: `h_Servers_${data[2]+1}`}),
+						bot.inlineButton('#vServers', {callback: `h_vServers_${data[2]+1}`}),
+						bot.inlineButton('#Docker', {callback: `h_Docker_${data[2]+1}`}),
+					],[
+						bot.inlineButton('#Hardware', {callback: `h_Hardware_${data[2]+1}`}),
+						bot.inlineButton('#Software', {callback: `h_Software_${data[2]+1}`}),
+						bot.inlineButton('#Network', {callback: `h_Network_${data[2]+1}`}),
+					],[
+						bot.inlineButton('#Pterodactyl', {callback: `h_Pterodactyl_${data[2]+1}`}),
+						bot.inlineButton('#Webserver', {callback: `h_Webserver_${data[2]+1}`})
+					],[
+						bot.inlineButton(`Senden (${Text.length})`, {callback: `Senden`})
+					]
+				]);
+			}else{
+				replyMarkup = bot.inlineKeyboard([
+					[
+						bot.inlineButton(`Senden (${Text.length})`, {callback: `Senden`})
+					]
+				]);
+			}
+
+			if ('inline_message_id' in msg) {
+				bot.editMessageText(
+					{inlineMsgId: inlineId}, Text,
+					{parseMode: 'html', webPreview: false, replyMarkup}
+				).catch(error => console.log('Error:', error));
+			}else{
+				bot.editMessageText(
+					{chatId: chatId, messageId: messageId}, Text,
+					{parseMode: 'html', webPreview: false, replyMarkup}
+				).catch(error => console.log('Error:', error));
+			}
+
 		}else if(data[0] === "m"){
 			if(data[1] === "delete"){
 				bot.deleteMessage(chatId, messageId).catch((error) => {
