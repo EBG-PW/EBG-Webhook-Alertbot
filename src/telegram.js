@@ -6,6 +6,7 @@ const package = require('../package');
 const fs = require('fs');
 const randomstring = require('randomstring');
 const request = require("request");
+const Sender = require('./lib/Sender')
 
 const Telebot = require('telebot');
 const bot = new Telebot({
@@ -489,7 +490,7 @@ bot.on('callbackQuery', (msg) => {
 		{
 			let type;
 			let Text = msg.message.text.replace("Ist diese Nachricht eine Information oder eine Störung?\n\n","");
-			if(data[1] === "stör"){type = "-- Alert --\n"}else{type = "-- Info --\n"}
+			if(data[1] === "stör"){type = "‼️  Alert  ‼️\n"}else{type = "🌐  Info  🌐\n"}
 			Text = `${type}${Text}`
 
 			const replyMarkup = bot.inlineKeyboard([
@@ -562,6 +563,30 @@ bot.on('callbackQuery', (msg) => {
 					{parseMode: 'html', webPreview: false, replyMarkup}
 				).catch(error => console.log('Error:', error));
 			}
+
+		}else if(data[0] === "Senden"){
+			Promise.all([bot.sendMessage(process.env.Telegram_EBGKanal_ID, msg.message.text, { parseMode: 'html' , webPreview: false}), Sender.pushTweet(msg.message.text, true)]).then((data) => {
+				//let MSG = `Telegram: https://t.me/${data[0].chat.username}/${data[0].message_id}\nTwitter: ${data[1].url}\n\nText:\n${msg.message.text}\n\nTwitter Stats:\nFollower: ${data[1].user.followers_count}\nLikes: ${data[1].favorite_count}\nRetweets: ${data[1].retweet_count}`
+				let MSG = `Telegram: https://t.me/${data[0].chat.username}/${data[0].message_id}\nTwitter: ${data[1].url}\n\nText:\n${msg.message.text}`
+				/*
+				const replyMarkup = bot.inlineKeyboard([
+					[
+						bot.inlineButton(`Aktualisieren`, {callback: `refresh_${data[1].id}`})
+					]
+				]);*/
+
+				if ('inline_message_id' in msg) {
+					bot.editMessageText(
+						{inlineMsgId: inlineId}, MSG,
+						{parseMode: 'html', webPreview: false}
+					).catch(error => console.log('Error:', error));
+				}else{
+					bot.editMessageText(
+						{chatId: chatId, messageId: messageId}, MSG,
+						{parseMode: 'html', webPreview: false}
+					).catch(error => console.log('Error:', error));
+				}
+			});
 
 		}else if(data[0] === "m"){
 			if(data[1] === "delete"){
