@@ -1,5 +1,5 @@
 {
     "Mute": false,
     "MuteUntil": 0,
-    "TimeUntilDownNotification": 60
+    "TimeUntilDownNotification": 120
 }
