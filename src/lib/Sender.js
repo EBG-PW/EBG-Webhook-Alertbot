@@ -31,6 +31,7 @@ const bot = new Telebot({
 			if(ConfJ.MuteUntil < Date.now()){
 				ConfJ.Mute = false;
 				bot.sendMessage(AppsJ.TelegramChatId, Msg, { parseMode: 'html' , webPreview: false});
+                console.log(`Telegram: ${Msg}`)
 				let NewJson = JSON.stringify(ConfJ);
 				fs.writeFile(`${process.env.Admin_DB}/UpDownConfig.json`, NewJson, (err) => {if (err) console.log(err);});
 			}
