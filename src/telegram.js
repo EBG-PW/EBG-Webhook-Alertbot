@@ -450,10 +450,14 @@ bot.on(/^\/help/i, (msg) => {
 	}else{
 		msg.reply.text(`Es gibt noch keine Admins...`);
 	}
+		let MSG_Default = ` -- Befehle für Nutzer -- \n/help - Zeigt diese Nachricht\n/alive - Zeigt den Bot Status\n\n`
 	if(AdminJson["Admins"].includes(msg.from.id)){
-		msg.reply.text(`Befehle für Nutzer:\n/help - Zeigt diese Nachricht\n/alive - Zeigt den Bot Status\n\nBefehle für Admins:\n/listRoutes - Zeigt alle Plugins und beispiel\n/listRoutes <Plugin Name> - Zeigt alle Routs\n/routes - Zeigt Hilfe für diesen Befehl\n/routes add|rem <Pluginname> - Erstellt/Löscht Route für Chat\n/mute - Um den Status Kanal zu muten/unmuten\n/newPush - Um einen neuen EBG-Post auf Twitter und dem TG Kanel zu senden\n/listAdmin - Zeigt alle Admins\n/addAdmin - Fügt Nutzer als Admin hinzu\n/remAdmin - Nimmt dem Nutzer Admin weg\n/listUser - Zeigt alle User\n/addUser - Fügt Nutzer als User hinzu\n/remUser - Nimmt dem Nutzer User weg`)
+		let MSG_Routes = `Routen:\n/listRoutes - Zeigt alle Plugins und beispiel\n/routes - Zeigt Hilfe für diesen Befehl\n\n`
+		let MSG_Kanal = `Benachrichtigungen:\n/mute - Um den Status Kanal zu muten/unmuten\n/newPush - Neuer EBG-Post auf Twitter & TG\n\n`
+		let MSG_Verwaltung = `Managment:\n/listAdmin - Zeigt alle Admins\n/addAdmin - Fügt Nutzer als Admin hinzu\n/remAdmin - Nimmt dem Nutzer Admin weg\n/listUser - Zeigt alle User\n/addUser - Fügt Nutzer als User hinzu\n/remUser - Nimmt dem Nutzer User weg\n\n`
+		msg.reply.text(`${MSG_Default}-- Befehle für Admins -- \n${MSG_Routes}${MSG_Kanal}${MSG_Verwaltung}`)
 	}else{
-		msg.reply.text(`Befehle für Nutzer:\n/help - Zeigt diese Nachricht\n/alive - Zeigt den Bot Status`);
+		msg.reply.text(`${MSG_Default}`);
 	}
 });
 /* -- Handle Bot -- */
