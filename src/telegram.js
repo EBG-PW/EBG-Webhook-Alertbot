@@ -1,6 +1,7 @@
 require('dotenv').config();
 const f = require('./lib/Funktions');
 const OS = require('./lib/Hardware');
+const DB = require('./lib/postgres');
 const ping = require('ping');
 const package = require('../package');
 const fs = require('fs');
@@ -14,6 +15,9 @@ const bot = new Telebot({
 	limit: 1000,
         usePlugins: ['commandButton']
 });
+
+const keyID = 'Admins';
+const keyName = 'AdminsName';
 
 let NewPushStore = [];
 let Time_started = new Date().getTime();
@@ -645,6 +649,39 @@ bot.on('callbackQuery', (msg) => {
 			text: "Diese Funktion ist nur für Administratoren.",
 			showAlert: true
 		});
+	}
+});
+
+/* -- Inline Handler -- */
+bot.on('inlineQuery', msg => {
+	let query = msg.query.toLowerCase();
+	let queryarr = query.split('');
+    const answers = bot.answerList(msg.id, {cacheTime: 1});
+    if(queryarr.length === 0){
+		answers.addArticle({
+			id: 'empty',
+			title: 'Bitte schreibe eine IP',
+			description: query,
+			message_text: ("Diese Funktion benötigt eine IPv4 Adresse.\nEs wird automatisch 192.168 vor der IP angebracht."),
+			reply_markup: replyMarkup,
+			parse_mode: 'html'
+		});
+		return bot.answerQuery(answers);
+	}else{
+		replyMarkup = bot.inlineKeyboard([[
+				bot.inlineButton('Schließen', {callback: 'Exit'}),
+			]
+		]);
+		//Code here to look IPs up
+		answers.addArticle({
+			id: 'empty',
+			title: 'Bitte schreibe eine IP',
+			description: query,
+			message_text: ("Diese Funktion benötigt eine IPv4 Adresse.\nEs wird automatisch 192.168 vor der IP angebracht."),
+			reply_markup: replyMarkup,
+			parse_mode: 'html'
+		});
+		return bot.answerQuery(answers);
 	}
 });
 
