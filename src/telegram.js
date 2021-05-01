@@ -18,6 +18,8 @@ const bot = new Telebot({
 
 const keyID = 'Admins';
 const keyName = 'AdminsName';
+var AdminJson;
+UpdateAdminJson();
 
 let NewPushStore = [];
 let Time_started = new Date().getTime();
@@ -42,10 +44,9 @@ bot.on(/^\/listRoutes( .+)*/i, (msg, props) => {
 				for(i in body.plugins){
 					LoadedPlugins.push(body.plugins[i].name.toLowerCase());
 				}
-				if(fs.existsSync(`${process.env.Admin_DB}/Admins.json`) && fs.existsSync(`${process.env.Plugin_DB}/Routs_${plugin}.json`)) {
-					var AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
+				if(fs.existsSync(`${process.env.Plugin_DB}/Routs_${plugin}.json`)) {
 					var UptimeRobotJson = JSON.parse(fs.readFileSync(`${process.env.Plugin_DB}/Routs_${plugin}.json`));
-					if(AdminJson["Admins"].includes(msg.from.id) && LoadedPlugins.includes(plugin.toLowerCase())){
+					if(AdminJson[keyID].includes(msg.from.id) && LoadedPlugins.includes(plugin.toLowerCase())){
 						let LoadedRoutes = "";
 						for(let i=0; i <= UptimeRobotJson.ChatID.length - 1; i++){
 							LoadedRoutes = `${LoadedRoutes}${UptimeRobotJson.ChatName[i]}(${UptimeRobotJson.ChatID[i]})\n<pre language="c++">${UptimeRobotJson.ChatToken[i]}</pre>\n`
@@ -87,10 +88,9 @@ bot.on(/^\/routes( .+)*/i, (msg, props) => {
 			let plugin = CheckAtributes.atributes[1];
 			let mode = CheckAtributes.atributes[0].toLowerCase();
 			if(AvaibleModes.includes(mode)){
-				if(fs.existsSync(`${process.env.Admin_DB}/Admins.json`) && fs.existsSync(`${process.env.Plugin_DB}/Routs_${plugin}.json`)) {
-					var AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
+				if(fs.existsSync(`${process.env.Plugin_DB}/Routs_${plugin}.json`)) {
 					var UptimeRobotJson = JSON.parse(fs.readFileSync(`${process.env.Plugin_DB}/Routs_${plugin}.json`));
-					if(AdminJson["Admins"].includes(msg.from.id) && LoadedPlugins.includes(plugin.toLowerCase())){
+					if(AdminJson[keyID].includes(msg.from.id) && LoadedPlugins.includes(plugin.toLowerCase())){
 						//User is Admin and Plugin exists!
 						if(mode === "add"){
 							if(UptimeRobotJson["ChatID"].includes(msg.chat.id)){
@@ -152,19 +152,12 @@ bot.on(/^\/routes( .+)*/i, (msg, props) => {
 
 /* -- Create Notifications for TG and Twitter -- */
 bot.on(/^\/newPush/i, (msg) => {
-	var keyID = 'Admins';
-	if(fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
-		let AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
-		
 		if(AdminJson[keyID].includes(msg.from.id)){
 			NewPushStore.push(msg.from.id)
 			bot.sendMessage(msg.chat.id, 'Was soll die Nachricht sein? (260 Zeichen)');
 		}else{
 			msg.reply.text(`Du musst Admin sein um dies zu nutzen!`);
 		}
-	}else{
-		msg.reply.text(`Es gibt noch keine Admins...`);
-	}
 });
 
 bot.on('text', msg => {
@@ -193,13 +186,6 @@ bot.on(/^\/mute/i, (msg) => {
 	});
 
 	let replyMarkup, MSG;
-	var keyID = 'Admins';
-
-	if(fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
-		var AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
-	}else{
-		msg.reply.text(`Es gibt noch keine Admins...`);
-	}
 
 	if(AdminJson[keyID].includes(msg.from.id)){
 		if(fs.existsSync(`${process.env.Admin_DB}/UpDownConfig.json`)){
@@ -236,13 +222,7 @@ bot.on(/^\/mute/i, (msg) => {
 /* -- Admin Managing List|Add|Remove -- */
 bot.on(/^\/listAdmin/i, (msg) => {
 	bot.deleteMessage(msg.chat.id, msg.message_id).catch(error => f.Elog('Error: (delMessage)', error.description));
-	var keyID = 'Admins';
-	var keyName = 'AdminsName';
-	if(fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
-		var AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
-	}else{
-		msg.reply.text(`Es gibt noch keine Admins...`);
-	}
+
 	if(AdminJson[keyID].includes(msg.from.id)){
 		let MessageAdmins = "Liste der Admins:\n\n";
 		for (i = 0; i < AdminJson[keyID].length; i++) {
@@ -264,16 +244,6 @@ bot.on(/^\/addAdmin/i, (msg) => {
 				var username = msg.reply_to_message.from.first_name.toString();
 			}
 
-			var keyID = 'Admins';
-			var keyName = 'AdminsName';
-			if(fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
-				var AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
-			}else{
-				console.log("No Admins file found!")
-				var AdminJson = {}
-				AdminJson[keyID] = [];
-				AdminJson[keyName] = [];
-			}
 			if(AdminJson[keyID].includes(msg.from.id)){
 				if(UserID === 777000 || UserID === 1087968824){
 					msg.reply.text(`${username}(${UserID}) dieser Nutzer darf kein Admin sein!`);
@@ -287,6 +257,7 @@ bot.on(/^\/addAdmin/i, (msg) => {
 						let NewJson = JSON.stringify(AdminJson);
 						msg.reply.text(`${username}(${UserID}) ist nun Admin!`);
 						fs.writeFile(`${process.env.Admin_DB}/Admins.json`, NewJson, (err) => {if (err) console.log(err);});
+						AdminJson = AdminJson;
 					}
 				}
 			}else{
@@ -306,20 +277,15 @@ bot.on(/^\/remAdmin/i, (msg) => {
 		}else{
 			var username = msg.reply_to_message.from.first_name.toString();
 		}
-		var keyID = 'Admins';
-		var keyName = 'AdminsName';
-		if(fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
-			var AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
-		}else{
-			msg.reply.text(`Es gibt noch keine Admins...`);
-		}
+
 		if(AdminJson[keyID].includes(msg.from.id)){
 			removeItemFromArrayByName(AdminJson[keyID], UserID)
 			removeItemFromArrayByName(AdminJson[keyName], username)
 
 			let NewJson = JSON.stringify(AdminJson);
-					msg.reply.text(`${username}(${UserID}) ist nun KEIN Admin mehr!`);
-					fs.writeFile(`${process.env.Admin_DB}/Admins.json`, NewJson, (err) => {if (err) console.log(err);});
+			msg.reply.text(`${username}(${UserID}) ist nun KEIN Admin mehr!`);
+			fs.writeFile(`${process.env.Admin_DB}/Admins.json`, NewJson, (err) => {if (err) console.log(err);});
+			AdminJson = AdminJson;
 		}else{
 			msg.reply.text(`Du musst Admin sein um dies zu nutzen!`);
 		}
@@ -335,8 +301,7 @@ bot.on(/^\/listUser/i, (msg) => {
 	bot.deleteMessage(msg.chat.id, msg.message_id).catch(error => f.Elog('Error: (delMessage)', error.description));
 	var keyID = 'User';
 	var keyName = 'UserName';
-	if(fs.existsSync(`${process.env.Admin_DB}/User.json`) && fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
-		var AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
+	if(fs.existsSync(`${process.env.Admin_DB}/User.json`)) {
 		var UserJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/User.json`));
 	}else{
 		msg.reply.text(`Es gibt noch keine User...`);
@@ -364,8 +329,7 @@ bot.on(/^\/addUser/i, (msg) => {
 
 			var keyID = 'User';
 			var keyName = 'UserName';
-			if(fs.existsSync(`${process.env.Admin_DB}/User.json`) && fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
-				var AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
+			if(fs.existsSync(`${process.env.Admin_DB}/User.json`)) {
 				var UserJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/User.json`));
 			}else{
 				console.log("No User file found!")
@@ -407,8 +371,7 @@ bot.on(/^\/remUser/i, (msg) => {
 		}
 		var keyID = 'User';
 		var keyName = 'UserName';
-		if(fs.existsSync(`${process.env.Admin_DB}/User.json`) && fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
-			var AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
+		if(fs.existsSync(`${process.env.Admin_DB}/User.json`)) {
 			var UserJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/User.json`));
 		}else{
 			msg.reply.text(`Es gibt noch keine User...`);
@@ -449,13 +412,8 @@ bot.on(/^\/alive/i, (msg) => {
 });
 
 bot.on(/^\/help/i, (msg) => {
-	if(fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
-		var AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
-	}else{
-		msg.reply.text(`Es gibt noch keine Admins...`);
-	}
 		let MSG_Default = ` -- Befehle für Nutzer -- \n/help - Zeigt diese Nachricht\n/alive - Zeigt den Bot Status\n\n`
-	if(AdminJson["Admins"].includes(msg.from.id)){
+	if(AdminJson[keyID].includes(msg.from.id)){
 		let MSG_Routes = `Routen:\n/listRoutes - Zeigt alle Plugins und beispiel\n/routes - Zeigt Hilfe für diesen Befehl\n\n`
 		let MSG_Kanal = `Benachrichtigungen:\n/mute - Um den Status Kanal zu muten/unmuten\n/newPush - Neuer EBG-Post auf Twitter & TG\n\n`
 		let MSG_Verwaltung = `Managment:\n/listAdmin - Zeigt alle Admins\n/addAdmin - Fügt Nutzer als Admin hinzu\n/remAdmin - Nimmt dem Nutzer Admin weg\n/listUser - Zeigt alle User\n/addUser - Fügt Nutzer als User hinzu\n/remUser - Nimmt dem Nutzer User weg\n\n`
@@ -477,11 +435,6 @@ bot.inlineButton('Muten', {callback: 'm_mute'}),
 
 bot.on('callbackQuery', (msg) => {
 	var keyID = 'Admins';
-	if(fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
-		var AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
-	}else{
-		msg.reply.text(`Es gibt noch keine Admins...`);
-	}
 
 	if(AdminJson[keyID].includes(msg.from.id)){
 		if ('inline_message_id' in msg) {
@@ -721,4 +674,16 @@ function AtrbutCheck(props) {
 			return {hasAtributes: true, atributes: atributeOName}
 		}
 	}
+}
+
+function UpdateAdminJson(){
+	if(fs.existsSync(`${process.env.Admin_DB}/Admins.json`)) {
+		AdminJson = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/Admins.json`));
+		console.error(`[Telegram] Loaded Admins`)
+	}else{
+		console.error(`[Telegram] Admins.json is missing... creating`)
+		const AdminJsonTemplate = {"Admins":[],"AdminsName":[]}
+		let NewJson = JSON.stringify(AdminJsonTemplate);
+			fs.writeFile(`${process.env.Admin_DB}/Admins.json`, NewJson, (err) => {if (err) console.log(err);});
+		}
 }
