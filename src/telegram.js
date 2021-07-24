@@ -1,7 +1,7 @@
 require('dotenv').config();
 const f = require('./lib/Funktions');
 const OS = require('./lib/Hardware');
-const DB = require('./lib/postgres');
+//const DB = require('./lib/postgres');
 const ping = require('ping');
 const package = require('../package');
 const fs = require('fs');
