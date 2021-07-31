@@ -42,15 +42,20 @@ fs.readdir("./src/webhook", function(err, filenames) {
       let PluginRequirementsFailed = false;
       let name = filenames[i].slice(0, filenames[i].length-3)
       iimport = require(`./${name}`);
-      iimport.PluginRequirements.map(Req => {
-        if(!Preplugins.includes(Req)){PluginRequirementsFailed = true}
-      });
-      if(!PluginRequirementsFailed){
-        plugins.push({route: `/${name}`, name: iimport.PluginName, version: iimport.PluginVersion, author: iimport.PluginAuthor, docs: iimport.PluginDocs})
-        router.use(`/${name}`, iimport.router);
-        console.log('[API.Plugins] \x1b[32m[OK]\x1b[0m',`Loaded ${filenames[i].slice(0, filenames[i].length-3)}`)
+      if(typeof(iimport.PluginRequirements) === "undefined" || typeof(iimport.PluginName) === "undefined" || typeof(iimport.PluginVersion) === "undefined" || typeof(iimport.PluginAuthor) === "undefined" || typeof(iimport.PluginDocs) === "undefined" || typeof(iimport.router) === "undefined"){
+        console.log('[API.Plugins] \x1b[31m[ER]\x1b[0m',`Skipped ${filenames[i].slice(0, filenames[i].length-3)} because there are missing exports!`)
       }else{
-        console.log('[API.Plugins] \x1b[31m[ER]\x1b[0m',`Plugin ${filenames[i]} requires following plugins [${iimport.PluginRequirements}] and at least one is missing!`)
+        iimport.PluginRequirements.map(Req => {
+          if(!Preplugins.includes(Req)){PluginRequirementsFailed = true}
+        });
+      
+        if(!PluginRequirementsFailed){
+          plugins.push({route: `/${name}`, name: iimport.PluginName, version: iimport.PluginVersion, author: iimport.PluginAuthor, docs: iimport.PluginDocs})
+          router.use(`/${name}`, iimport.router);
+          console.log('[API.Plugins] \x1b[32m[OK]\x1b[0m',`Loaded ${filenames[i].slice(0, filenames[i].length-3)}`)
+        }else{
+          console.log('[API.Plugins] \x1b[31m[ER]\x1b[0m',`Plugin ${filenames[i].slice(0, filenames[i].length-3)}} requires following plugins [${iimport.PluginRequirements}] and at least one is missing!`)
+        }
       }
     }else{
       console.log('[API.Plugins] \x1b[31m[ER]\x1b[0m',`Unknown file was skipped ${filenames[i]}`)
