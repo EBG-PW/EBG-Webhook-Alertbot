@@ -8,6 +8,9 @@ const fs = require('fs');
 const randomstring = require('randomstring');
 const request = require("request");
 const Sender = require('./lib/Sender')
+const UpdownClient = require('node-updown')
+
+const client = new UpdownClient.UpdownClient(process.env.UpdownIO_Key);
 
 const Telebot = require('telebot');
 const bot = new Telebot({
@@ -111,10 +114,10 @@ bot.on(/^\/routes( .+)*/i, (msg, props) => {
 
 								let NewJson = JSON.stringify(UptimeRobotJson);
 								msg.reply.text(`Der Chat ${msg.chat.title}(${msg.chat.id}) hat nun eine Route.`);
-								bot.sendMessage(msg.from.id, `Der Key für ${msg.chat.title}(${msg.chat.id}) lautet:\n<pre language="c++">${RString}</pre>\n\nBeispiel:\n<pre language="c++">${process.env.ProxyDomain}/webhook/${plugin}/${RString}</pre>`, { parseMode: 'html' , webPreview: false}).catch(function(error) {
+								bot.sendMessage(msg.from.id, `Der Key für ${ChatTitle}(${msg.chat.id}) lautet:\n<pre language="c++">${RString}</pre>\n\nBeispiel:\n<pre language="c++">${process.env.ProxyDomain}/webhook/${plugin}/${RString}</pre>`, { parseMode: 'html' , webPreview: false}).catch(function(error) {
 									msg.reply.text(`!--- ACHTUNG ---!\n\nIch konnte dir den Key leider nicht persönlich zustellen :(\nBitte schreibe mich privat an!\nUm an den Key zu kommen mach bitte /listRoutes`)
 								})
-								fs.writeFile(`${process.env.Plugin_DB}/Routs_UptimeRobot.json`, NewJson, (err) => {if (err) console.log(err);});
+								fs.writeFile(`${process.env.Plugin_DB}/Routs_${plugin}.json`, NewJson, (err) => {if (err) console.log(err);});
 							}
 						}else if(mode === "remove" || mode === "rem"){
 							if(UptimeRobotJson["ChatID"].includes(msg.chat.id)){
