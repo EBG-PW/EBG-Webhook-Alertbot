@@ -45,21 +45,30 @@ function Check(){
 		let nowDOWN = [];
 		let ChecksSplit = groupBy(Checks, 'down')
 		ChecksSplit.false.map(Monitor => {
-			nowUP.push(Monitor.token)
+			nowUP.push(Monitor.token);
 		})
 		ChecksSplit.true.map(Monitor => {
-			nowDOWN.push(Monitor.token)
+			nowDOWN.push(Monitor.token);
 		})
-		console.log(nowUP,nowDOWN)
 		
 		let dUP = nowUP.filter(x => !OldStatus.Online.includes(x));
 		let dDown = nowDOWN.filter(x => !OldStatus.Offline.includes(x));
+
+		OldStatus.Online = nowUP;
+		OldStatus.Offline = nowDOWN;
+
+		let NewJson = JSON.stringify(OldStatus);
+		fs.writeFile(`${process.env.Plugin_DB}/${PluginName}_Status.json`, NewJson, (err) => {if (err) console.log(err);});
 
 		console.log(dUP,dDown)
 	});
 }
 
-Check()
+//Check()
+
+setInterval(function(){
+	Check();
+}, 1*5000+50);
 
 const router = express.Router();
 
