@@ -26,11 +26,11 @@ const bot = new Telebot({
 		let AppsJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownServices.json`));
 		let ConfJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownConfig.json`));
 		if(!ConfJ.Mute){
-			bot.sendMessage(AppsJ.TelegramChatId, Msg, { parseMode: 'html' , webPreview: false});
+			bot.sendMessage(AppsJ.TelegramChatId, Msg, { parseMode: 'html' , webPreview: false}).catch(error => console.log('Error:', error));
 		}else{
 			if(ConfJ.MuteUntil < Date.now()){
 				ConfJ.Mute = false;
-				bot.sendMessage(AppsJ.TelegramChatId, Msg, { parseMode: 'html' , webPreview: false});
+				bot.sendMessage(AppsJ.TelegramChatId, Msg, { parseMode: 'html' , webPreview: false}).catch(error => console.log('Error:', error));
                 console.log(`Telegram: ${Msg}`)
 				let NewJson = JSON.stringify(ConfJ);
 				fs.writeFile(`${process.env.Admin_DB}/UpDownConfig.json`, NewJson, (err) => {if (err) console.log(err);});

@@ -3,6 +3,7 @@ const express = require('express');
 const fs = require('fs');
 var Time_started = new Date().getTime();
 const UpdownClient = require('node-updown')
+const Sender = require('../lib/Sender')
 
 const client = new UpdownClient.UpdownClient(process.env.UpdownIO_Key);
 
@@ -60,7 +61,28 @@ function Check(){
 		let NewJson = JSON.stringify(OldStatus);
 		fs.writeFile(`${process.env.Plugin_DB}/${PluginName}_Status.json`, NewJson, (err) => {if (err) console.log(err);});
 
-		console.log(dUP,dDown)
+		let Message_Twitter = [];
+		let Message_Kanal = [];
+
+		Checks.map(Check => {
+			if(OldStatus.Twitter.includes(Check.token)){
+				if(dUP.includes(Check.token)){
+					Message_Twitter.push(`The Monitor ${Check.alias} is up again.\nThe Uptime now is ${Check.uptime}`)
+				}else if(dDown.includes(Check.token)){
+					Message_Twitter.push(`The Monitor ${Check.alias} is down since ${Check.down_since}.\nReason: ${Check.error}`)
+				}
+			}
+			
+			if(OldStatus.Kanal.includes(Check.token)){
+				if(dUP.includes(Check.token)){
+					Message_Kanal.push(`The Monitor ${Check.alias} is up again.\nThe Uptime now is ${Check.uptime}`)
+				}else if(dDown.includes(Check.token)){
+					Message_Kanal.push(`The Monitor ${Check.alias} is down since ${Check.down_since}.\nReason: ${Check.error}`)
+				}
+			}
+		})
+		if(Message_Kanal.length > 0){Sender.pushTelegram(Message_Kanal.join("\n\n"))}
+		if(Message_Twitter.length > 0){Sender.pushTweet(Message_Twitter.join("\n\n"))}
 	});
 }
 
