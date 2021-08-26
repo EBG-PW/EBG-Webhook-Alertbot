@@ -1,5 +1,6 @@
 require('dotenv').config();
 const fs = require('fs');
+const axios = require('axios')
 
 const Twitter = require('twitter');
 var client = new Twitter({
@@ -40,6 +41,48 @@ const bot = new Telebot({
 }
 
 /**
+ * Will send a given string with discord parsing
+ * Loads from UpDownConfig and will handle the mute function
+ * @param {String} Msg 
+ */
+ function pushDiscord(Msg){
+    return new Promise(function(resolve, reject) {
+        if(fs.existsSync(`${process.env.Admin_DB}/UpDownServices.json`) && fs.existsSync(`${process.env.Admin_DB}/UpDownConfig.json`)){
+            let ConfJ = JSON.parse(fs.readFileSync(`${process.env.Admin_DB}/UpDownConfig.json`));
+            if(!ConfJ.Mute){
+                axios
+                    .post(process.env.Discord_Webhook, {
+                        content: Msg
+                    })
+                    .then(res => {
+                        resolve(res)
+                    })
+                    .catch(error => {
+                        console.error(error)
+                    })
+            }else{
+                if(ConfJ.MuteUntil < Date.now()){
+                    ConfJ.Mute = false;
+                        axios
+                        .post(process.env.Discord_Webhook, {
+                            content: Msg
+                        })
+                        .then(res => {
+                            resolve(res)
+                        })
+                        .catch(error => {
+                            console.error(error)
+                        })
+                    console.log(`Discord: ${Msg}`)
+                    let NewJson = JSON.stringify(ConfJ);
+                    fs.writeFile(`${process.env.Admin_DB}/UpDownConfig.json`, NewJson, (err) => {if (err) console.log(err);});
+                }
+            }
+        }
+    });
+}
+
+/**
  * Will send a html parsed string to twitter
  * Loads from UpDownConfig and will handle the mute function
  * @param {String} text 
@@ -68,5 +111,6 @@ let pushTweet = function(text, override) {
 
 module.exports = {
 	pushTelegram,
+    pushDiscord,
     pushTweet
   };

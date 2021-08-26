@@ -537,7 +537,7 @@ bot.on('callbackQuery', (msg) => {
 				console.error(error);
 			});
 		}else if(data[0] === "Senden"){
-			Promise.all([bot.sendMessage(process.env.Telegram_EBGKanal_ID, msg.message.text, { parseMode: 'html' , webPreview: false}), Sender.pushTweet(msg.message.text, true)]).then((data) => {
+			Promise.all([bot.sendMessage(process.env.Telegram_EBGKanal_ID, msg.message.text, { parseMode: 'html' , webPreview: false}), Sender.pushDiscord(msg.message.text), Sender.pushTweet(msg.message.text, true)]).then((data) => {
 				//let MSG = `Telegram: https://t.me/${data[0].chat.username}/${data[0].message_id}\nTwitter: ${data[1].url}\n\nText:\n${msg.message.text}\n\nTwitter Stats:\nFollower: ${data[1].user.followers_count}\nLikes: ${data[1].favorite_count}\nRetweets: ${data[1].retweet_count}`
 				let MSG = `Telegram: https://t.me/${data[0].chat.username}/${data[0].message_id}\nTwitter: ${data[1].url}\n\nText:\n${msg.message.text}`
 				/*
